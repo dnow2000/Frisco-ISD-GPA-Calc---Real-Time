@@ -6,9 +6,9 @@ from selenium.webdriver.chrome.options import Options
 courseList = [] #Hold all the Course objects to run calculations off
 
 PATH = 'C:\Program Files (x86)\chromedriver.exe'
-opts = Options()
-opts.add_argument("--headless")
-driver = webdriver.Chrome(PATH)
+#opts = Options()
+#opts.add_argument("--headless") #Toggle headless browser
+driver = webdriver.Chrome(PATH) 
 
 gpas = None
 
@@ -47,7 +47,7 @@ def create_login_page():
         global PATH
         global driver
 
-        driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Assignments.aspx")
+        driver.get("https://hac.friscoisd.org/HomeAccess/Grades/IPR")
 
         username_field = driver.find_element_by_id("LogOnDetails_UserName")
         password_field = driver.find_element_by_id("LogOnDetails_Password")
@@ -58,9 +58,9 @@ def create_login_page():
 
         password_field.send_keys(Keys.RETURN)
 
-        if(driver.current_url == "https://hac.friscoisd.org/HomeAccess/Home/WeekView"):
+        if(driver.current_url == "https://hac.friscoisd.org/HomeAccess/Grades/IPR"):
             login_page.destroy()
-
+            
             create_main_page()
         else:
             not_successful_popup = Tk()
@@ -176,7 +176,7 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
     weighted_gpa_label.place(x = 135, y = 100)
     unweighted_gpa_label.place(x = 135, y = 200)
 
-    def redo():
+    def redo(): #Redo Calculation with new parameters
         global courseList
         
         weighted_gpa_header.destroy()
