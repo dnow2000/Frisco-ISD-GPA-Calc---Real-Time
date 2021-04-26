@@ -47,7 +47,7 @@ def create_login_page():
         global PATH
         global driver
 
-        driver.get("https://hac.friscoisd.org/HomeAccess/Grades/IPR")
+        driver.get("https://hac.friscoisd.org/HomeAccess/Grades/Transcript")
 
         username_field = driver.find_element_by_id("LogOnDetails_UserName")
         password_field = driver.find_element_by_id("LogOnDetails_Password")
@@ -58,10 +58,10 @@ def create_login_page():
 
         password_field.send_keys(Keys.RETURN)
 
-        if(driver.current_url == "https://hac.friscoisd.org/HomeAccess/Grades/IPR"):
+        if(driver.current_url == "https://hac.friscoisd.org/HomeAccess/Grades/Transcript"):
             login_page.destroy()
-            
-            create_main_page()
+
+            get_grades()
         else:
             not_successful_popup = Tk()
             not_successful_popup.geometry('230x50')
@@ -74,93 +74,61 @@ def create_login_page():
     
     login_page.mainloop()
 
-#Once the login is authenticated, this is the calculation page
-def create_main_page():  
+def get_grades():
+    global driver
+    global PATH
+    global courseList
+
+    driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Transcript.aspx")
+
+    current_weighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum1").text
+    current_unweighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum2").text
+
+    driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Assignments.aspx")
+
+    
+    x = 4
+    try:
+        for i in range(15):
+            name = driver.find_element_by_xpath(f'//*[@id="plnMain_pnlFullPage"]/div[{x}]/div[1]/a').text
+            grade = driver.find_element_by_id(f'plnMain_rptAssigmnetsByCourse_lblHdrAverage_{i}').text
+            weight = 5
+            credits = 1
+
+            x+=1
+            
+            if(grade != ''):
+                grade = grade.replace('Student Grades ', '').replace('%', '')
+                grade = float(grade)
+                
+                if(('pap' in name.lower()) or ('ap' in name.lower()) or ('adv computer science' in name.lower())):
+                    weight = 6
+
+                if(('ISM' in name) or ('Academic Decathlon' in name)):
+                    weight = 5.5
+                
+                double_weighted = ['gt', 'physics c', 'veterinary', 'equipment', 'architectural design 2', 'interior design 2', 'animation', 'sports broadcasting', 'graphic Design', 'child guidance', 
+                'education and training', 'practicum in govern', 'clinical', 'electrocardiography', 'medical technician', 'hospitality', 'culinary', 'ap computer', 'sports management']
+
+                for b in double_weighted:
+                    if(b in name.lower()):
+                        credits = 2
+                
+                courseList.append(Course(name, grade, weight, credits))
+                weight = 5
+                credits = 1
+    except:   
+        compute_gpa()
+        
+
+def create_display_page(): #Displays the final weighted and unweighted GPA 
+    global gpas
+
     mainpage = Tk()
     mainpage.configure(background = '#6200EE') 
     mainpage.geometry('300x300')
     header = Label(mainpage, background = '#6200EE' ,text = 'GPA CALCULATOR', fg = 'White', font = 'BEBAS 20 bold').place(x=20, y=0)
-    
-    course_name_label = Label(mainpage, text = 'Course Name:', background = '#6200EE', fg = 'White')
-    course_grade_label = Label(mainpage, text = 'Grade:', background = '#6200EE', fg = 'White')
-    course_weight_label = Label(mainpage, text = 'Weight:', background = '#6200EE', fg = 'White')
-    course_credits_label = Label(mainpage, text = 'Credit:', background = '#6200EE', fg = 'White')
 
-    course_name_label.place(x = 20, y = 50)
-    course_grade_label.place(x = 20, y = 100)
-    course_weight_label.place(x= 20, y = 150)
-    course_credits_label.place(x = 20, y = 200)
-
-    course_name_entry = (Entry(mainpage))
-    course_grade_entry = Entry(mainpage)
-    course_weight_entry = Entry(mainpage)
-    course_credits_entry = Entry(mainpage)
-
-    course_name_entry.place(x = 120, y = 50)
-    course_grade_entry.place(x = 120, y = 100)
-    course_weight_entry.place(x = 120, y = 150)
-    course_credits_entry.place(x = 120, y = 200)
-
-    #Decorator to avoid ZeroDivisionError if there are no classes added to the courselist
-    def smart_clear(func):
-        def inner():
-            if(len(courseList) <= 0):
-                no_classes_label = Label(mainpage, text = 'No classes added', background = '#6200EE', font = 'bebas 10 bold', fg = 'White').pack()
-            else:
-                func()
-        return inner
-
-    @smart_clear
-    def clear():
-        course_name_label.destroy() #Destroy all elements on the window
-        course_grade_label.destroy()
-        course_weight_label.destroy()
-        course_credits_label.destroy()
-
-        course_name_entry.destroy()
-        course_grade_entry.destroy()
-        course_weight_entry.destroy()
-        course_credits_entry.destroy()
-        
-        add_button.destroy()
-        calc_gpa.destroy()
-
-        compute_gpa() #Begins the calculation on all the Class objecsts in the courselist
-
-    #Adds a Course object to the courseList
-    def add_to_courseList():
-        global courseList
-
-        try:
-            name = course_name_entry.get()
-            grade = float(course_grade_entry.get())
-            weight = int(course_weight_entry.get())
-            num_credits = int(course_credits_entry.get())
-        except ValueError: #Ex: String in place of an float
-            value_error_popup = Tk()
-            value_error_popup.config(background = '#6200EE')
-            value_error_label = Label(value_error_popup, text = 'Incorrect Values', background = '#6200EE', font = 'bebas 10 bold', fg = 'White').pack()
-        else:
-            courseList.append(Course(name, grade, weight, num_credits)) #Create a Course object using the parameters then append that to the courselist
-
-            #Popup that says the class was added successfully
-            class_added_window = Tk()
-            class_added_window.config(background = '#6200EE')
-            class_added_window.geometry('200x50')
-
-            class_added_label = Label(class_added_window, text = 'Class added successfully', background = '#6200EE', font = 'bebas 10 bold', fg = 'White').pack()      
-
-    #Don't forget to create the button
-    add_button = Button(text = 'Add Class', command = add_to_courseList, height = 1, width = 10)
-    calc_gpa = Button(text = 'Calculate', command = clear, height = 1, width = 10)
-
-    add_button.place(x = 35, y = 250)
-    calc_gpa.place(x = 165, y = 250)
-    
-    mainpage.mainloop() #Make the elements show up
-
-def create_display_page(): #Displays the final weighted and unweighted GPA 
-    global gpas
 
     weighted_gpa, unweighted_gpa = gpas
     
