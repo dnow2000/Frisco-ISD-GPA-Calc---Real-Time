@@ -1,8 +1,3 @@
-'''
-Author: @SumitNalavade
-'''
-
-
 from tkinter import *
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -13,7 +8,7 @@ courseList = [] #Hold all the Course objects to run calculations off
 PATH = 'C:\Program Files (x86)\chromedriver.exe'
 opts = Options()
 opts.add_argument("--headless") #Toggle headless browser
-driver = webdriver.Chrome(PATH) 
+driver = webdriver.Chrome(PATH, options= opts) 
 
 gpas = None
 current_unweighted_gpa = None
@@ -55,25 +50,25 @@ def create_login_page():
 
         driver.get("https://hac.friscoisd.org/HomeAccess/Grades/Transcript")
 
-        username_field = driver.find_element_by_id("LogOnDetails_UserName")
+        username_field = driver.find_element_by_id("LogOnDetails_UserName") #Find and enter user inputted username and password into HAC
         password_field = driver.find_element_by_id("LogOnDetails_Password")
         login_button = driver.find_element_by_id("login")
 
         username_field.send_keys(username_entry.get())
         password_field.send_keys(password_entry.get())
 
-        password_field.send_keys(Keys.RETURN)
+        password_field.send_keys(Keys.RETURN) #Press enter button
 
-        if(driver.current_url == "https://hac.friscoisd.org/HomeAccess/Grades/Transcript"):
-            login_page.destroy()
+        if(driver.current_url == "https://hac.friscoisd.org/HomeAccess/Grades/Transcript"): #If the login is successful, redirects to this page
+            login_page.destroy() 
 
-            get_grades()
+            get_grades() #If the login is successful, the calculation begins 
         else:
             not_successful_popup = Tk()
             not_successful_popup.geometry('230x50')
             not_successful_popup.config(background = '#6200EE')
 
-            not_successful_label = Label(not_successful_popup, text = 'Incorrect Username or Password', background = '#6200EE', font = 'Bebas 10 bold', fg = 'White').pack()
+            not_successful_label = Label(not_successful_popup, text = 'Incorrect Username or Password', background = '#6200EE', font = 'Bebas 10 bold', fg = 'White').pack() #Pop up if login not successful
 
     login_button = Button(login_page, text = 'Login', command = authenticate_login, height = 2, width = 20)
     login_button.place(x = 68, y = 200)
@@ -89,16 +84,16 @@ def get_grades():
 
     driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Transcript.aspx")
 
-    current_weighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum1").text
-    current_unweighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum2").text
+    current_weighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum1").text #Finds the current weighted and unweighted GPAs
+    current_unweighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum2").text 
 
-    driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Assignments.aspx")
+    driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Assignments.aspx") #Naviagate to the real-time grades
 
     
     x = 4
     try:
         for i in range(15):
-            name = driver.find_element_by_xpath(f'//*[@id="plnMain_pnlFullPage"]/div[{x}]/div[1]/a').text
+            name = driver.find_element_by_xpath(f'//*[@id="plnMain_pnlFullPage"]/div[{x}]/div[1]/a').text #Find the name and grades for all the current classes
             grade = driver.find_element_by_id(f'plnMain_rptAssigmnetsByCourse_lblHdrAverage_{i}').text
             weight = 5
             credits = 1
@@ -106,10 +101,10 @@ def get_grades():
             x+=1
             
             if(grade != ''):
-                grade = grade.replace('Student Grades ', '').replace('%', '')
+                grade = grade.replace('Student Grades ', '').replace('%', '') #Change grade from str to int
                 grade = float(grade)
                 
-                if(('pap' in name.lower()) or ('ap' in name.lower()) or ('adv computer science' in name.lower())):
+                if(('pap' in name.lower()) or ('ap' in name.lower()) or ('adv computer science' in name.lower())): #Edge cases in which the credit or weight is diffrent 
                     weight = 6
 
                 if(('ISM' in name) or ('Academic Dec' in name)):
@@ -122,12 +117,12 @@ def get_grades():
                     if(b in name.lower()):
                         credits = 2
                 
-                courseList.append(Course(name, grade, weight, credits))
+                courseList.append(Course(name, grade, weight, credits)) #Creates a course object from the name, grade, wight and credits then appends it to the courselist
                 weight = 5
                 credits = 1
     except:   
         compute_gpa()
-        driver.close()
+        driver.close() #Make sure to close the headless browser to prevent memory clog up
         
 
 def create_display_page(): #Displays the final weighted and unweighted GPA 
@@ -170,7 +165,7 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
 
         mainpage.destroy()
 
-        driver = webdriver.Chrome(PATH) 
+        driver = webdriver.Chrome(PATH, options = opts) #Reinitializes the webdriver
         
         create_login_page()
 
@@ -212,7 +207,7 @@ def compute_gpa(): #calculates the weighted and unweighted gpas from the coursel
 
 	unweightedGpa = (sum(unweighted_gpa_list) / number_of_total_credits)
 
-	weightedGpa = ((float(current_weighted_gpa) * 5) + weightedGpa)/6
+	weightedGpa = ((float(current_weighted_gpa) * 5) + weightedGpa)/6 #Merges the gpas from HAC with the current calculated GPAs
 	unweightedGpa = ((float(current_unweighted_gpa) * 5) + unweightedGpa)/6
     
 	gpas = (weightedGpa, unweightedGpa)
