@@ -1,7 +1,7 @@
 '''
-Author @Sumit Nalavade
-
+Author: @SumitNalavade
 '''
+
 
 from tkinter import *
 from selenium import webdriver
@@ -11,11 +11,13 @@ from selenium.webdriver.chrome.options import Options
 courseList = [] #Hold all the Course objects to run calculations off
 
 PATH = 'C:\Program Files (x86)\chromedriver.exe'
-#opts = Options()
-#opts.add_argument("--headless") #Toggle headless browser
+opts = Options()
+opts.add_argument("--headless") #Toggle headless browser
 driver = webdriver.Chrome(PATH) 
 
 gpas = None
+current_unweighted_gpa = None
+current_weighted_gpa = None
 
 class Course(): #Course object
     def __init__(self, name, grade, weight, credits):
@@ -27,14 +29,13 @@ class Course(): #Course object
     def __str__(self):
         return (f'NAME: {self.name}, GRADE: {self.grade}, WEIGHT: {self.weight}, CREDITS: {self.credits}')
 
-#create main window
-login_page = Tk()
-login_page.configure(background = '#6200EE') 
-login_page.geometry('300x300')
-header = Label(login_page, background = '#6200EE' ,text = 'GPA CALCULATOR', fg = 'White', font = 'BEBAS 20 bold').place(x=20, y=0)
-
 #creates the login page
 def create_login_page():
+    #create main window
+    login_page = Tk()
+    login_page.configure(background = '#6200EE') 
+    login_page.geometry('300x300')
+    header = Label(login_page, background = '#6200EE' ,text = 'GPA CALCULATOR', fg = 'White', font = 'BEBAS 20 bold').place(x=20, y=0)
     username_label = Label(login_page, text  = 'Enter Username:', background = '#6200EE', fg = 'White')
     password_label = Label(login_page, text = 'Enter Password', background = '#6200EE', fg = 'White')
 
@@ -83,6 +84,8 @@ def get_grades():
     global driver
     global PATH
     global courseList
+    global current_unweighted_gpa
+    global current_weighted_gpa
 
     driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Transcript.aspx")
 
@@ -109,7 +112,7 @@ def get_grades():
                 if(('pap' in name.lower()) or ('ap' in name.lower()) or ('adv computer science' in name.lower())):
                     weight = 6
 
-                if(('ISM' in name) or ('Academic Decathlon' in name)):
+                if(('ISM' in name) or ('Academic Dec' in name)):
                     weight = 5.5
                 
                 double_weighted = ['gt', 'physics c', 'veterinary', 'equipment', 'architectural design 2', 'interior design 2', 'animation', 'sports broadcasting', 'graphic Design', 'child guidance', 
@@ -124,6 +127,7 @@ def get_grades():
                 credits = 1
     except:   
         compute_gpa()
+        driver.close()
         
 
 def create_display_page(): #Displays the final weighted and unweighted GPA 
@@ -137,6 +141,9 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
 
     weighted_gpa, unweighted_gpa = gpas
     
+    weighted_gpa = round(weighted_gpa, 3)
+    unweighted_gpa = round(unweighted_gpa, 3)
+
     weighted_gpa_header = Label(mainpage, text = 'Weighted GPA:', background = '#6200EE', font = 'bebas 15 bold', fg = 'White')
     unweighted_gpa_header = Label(mainpage, text = 'Unweighted GPA:', background = '#6200EE', font = 'bebas 15 bold', fg = 'white')
 
@@ -146,11 +153,12 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
     weighted_gpa_label = Label(mainpage, text = weighted_gpa, background = '#6200EE', font = 'bebas 15 bold', fg ='White')
     unweighted_gpa_label = Label(mainpage, text = unweighted_gpa, background = '#6200EE', font = 'bebas 15 bold', fg ='White')
 
-    weighted_gpa_label.place(x = 135, y = 100)
-    unweighted_gpa_label.place(x = 135, y = 200)
+    weighted_gpa_label.place(x = 132, y = 100)
+    unweighted_gpa_label.place(x = 132, y = 200)
 
     def redo(): #Redo Calculation with new parameters
         global courseList
+        global driver
         
         weighted_gpa_header.destroy()
         unweighted_gpa_header.destroy()
@@ -160,7 +168,11 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
 
         courseList.clear()
 
-        create_main_page()
+        mainpage.destroy()
+
+        driver = webdriver.Chrome(PATH) 
+        
+        create_login_page()
 
     redo_button = Button(mainpage, text = 'Retry', font = 'bebas 10 bold', height = 1, width = 20, command = redo)
     redo_button.place(x = 67, y = 250)
@@ -168,6 +180,8 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
 def compute_gpa(): #calculates the weighted and unweighted gpas from the courselist, Returns a tuple of both
 	global courseList
 	global gpas
+	global current_unweighted_gpa
+	global current_weighted_gpa
 	
 	number_of_total_credits = 0
 	for courses in courseList:
@@ -189,13 +203,18 @@ def compute_gpa(): #calculates the weighted and unweighted gpas from the coursel
 	for courses in courseList: #Iterates through the courselist and calculates unweighted GPA out of 4.0
 		unweightedGpa = ((4.0 - ((90 - courses.grade)/10)) * courses.credits)
 		
-		if (unweightedGpa > 4.0):
+		if((courses.credits == 2) and (unweightedGpa > 8.0)):
+			unweightedGpa = 8.0
+		elif (unweightedGpa > 4.0):
 			unweightedGpa = 4.0
 
 		unweighted_gpa_list.append(unweightedGpa)
 
 	unweightedGpa = (sum(unweighted_gpa_list) / number_of_total_credits)
 
+	weightedGpa = ((float(current_weighted_gpa) * 5) + weightedGpa)/6
+	unweightedGpa = ((float(current_unweighted_gpa) * 5) + unweightedGpa)/6
+    
 	gpas = (weightedGpa, unweightedGpa)
 	create_display_page()
 
