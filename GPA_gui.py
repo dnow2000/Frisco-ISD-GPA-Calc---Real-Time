@@ -8,11 +8,13 @@ courseList = [] #Hold all the Course objects to run calculations off
 PATH = 'C:\Program Files (x86)\chromedriver.exe'
 opts = Options()
 opts.add_argument("--headless") #Toggle headless browser
-driver = webdriver.Chrome(PATH, options= opts) 
+
+driver = webdriver.Chrome(PATH, options = opts) 
 
 gpas = None
 current_unweighted_gpa = None
 current_weighted_gpa = None
+current_gradelevel = None
 
 class Course(): #Course object
     def __init__(self, name, grade, weight, credits):
@@ -61,6 +63,7 @@ def create_login_page():
 
         if(driver.current_url == "https://hac.friscoisd.org/HomeAccess/Grades/Transcript"): #If the login is successful, redirects to this page
             login_page.destroy() 
+            pass
 
             get_grades() #If the login is successful, the calculation begins 
         else:
@@ -70,7 +73,7 @@ def create_login_page():
 
             not_successful_label = Label(not_successful_popup, text = 'Incorrect Username or Password', background = '#6200EE', font = 'Bebas 10 bold', fg = 'White').pack() #Pop up if login not successful
 
-    login_button = Button(login_page, text = 'Login', command = authenticate_login, height = 2, width = 20)
+    login_button = Button(login_page, text = 'Login', command = authenticate_login, height = 1, width = 20, background = 'white', font = 'bebas 10 bold')
     login_button.place(x = 68, y = 200)
     
     login_page.mainloop()
@@ -81,15 +84,22 @@ def get_grades():
     global courseList
     global current_unweighted_gpa
     global current_weighted_gpa
+    global current_gradelevel
 
     driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Transcript.aspx")
 
     current_weighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum1").text #Finds the current weighted and unweighted GPAs
     current_unweighted_gpa = driver.find_element_by_id("plnMain_rpTranscriptGroup_lblGPACum2").text 
 
+    try:
+        for a in range(6):
+            current_gradelevel = driver.find_element_by_id(f"plnMain_rpTranscriptGroup_lblGradeValue_{a}").text
+            current_gradelevel = int(current_gradelevel)
+    except:
+        pass
+
     driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Assignments.aspx") #Naviagate to the real-time grades
 
-    
     x = 4
     try:
         for i in range(15):
@@ -177,8 +187,20 @@ def compute_gpa(): #calculates the weighted and unweighted gpas from the coursel
 	global gpas
 	global current_unweighted_gpa
 	global current_weighted_gpa
+	global current_gradelevel
 	
 	number_of_total_credits = 0
+	total_semesters = 0
+
+	if(current_gradelevel == 12):
+		total_semesters = 7
+	elif(current_gradelevel == 11):
+		total_semesters = 5
+	elif(current_gradelevel == 10):
+		total_semesters = 3
+	elif(current_gradelevel == 9):
+		total_semesters = 1
+
 	for courses in courseList:
 		number_of_total_credits += courses.credits
 
@@ -207,8 +229,8 @@ def compute_gpa(): #calculates the weighted and unweighted gpas from the coursel
 
 	unweightedGpa = (sum(unweighted_gpa_list) / number_of_total_credits)
 
-	weightedGpa = ((float(current_weighted_gpa) * 5) + weightedGpa)/6 #Merges the gpas from HAC with the current calculated GPAs
-	unweightedGpa = ((float(current_unweighted_gpa) * 5) + unweightedGpa)/6
+	weightedGpa = ((float(current_weighted_gpa) * total_semesters) + weightedGpa)/(total_semesters+1) #Merges the gpas from HAC with the current calculated GPAs
+	unweightedGpa = ((float(current_unweighted_gpa) * total_semesters) + unweightedGpa)/(total_semesters+1)
     
 	gpas = (weightedGpa, unweightedGpa)
 	create_display_page()
