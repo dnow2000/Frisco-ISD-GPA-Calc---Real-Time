@@ -9,15 +9,11 @@ This project is designed to perform the correct calculations on student data fro
 
 ![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/main/HAC.png)
 
-Two apps in repository:
+*Two apps in repository:*
 
-.exe file (For windows)
+*.exe file (For windows)*
 
-.app file (Coming soon for Mac)
-
-
-
-
+*.app file (Coming soon for Mac)*
 
 The calculation works in two stages:
 1. Retreive the existing student GPA as noted on their transcript from HAC
@@ -26,6 +22,6 @@ The calculation works in two stages:
 
 To retreieve student data from Home Access Center, the python Selenium web scraping library was used in a headless browser.
 
-** Objectives: Demonstrate knowledge of object oriented programming, integrate external libraries for a specific goal,
-touch base with the Tkinter library for python guis, Demonstrate problem solving skills that come with a larger project **
+**Objectives: Demonstrate knowledge of object oriented programming, integrate external libraries for a specific goal,
+touch base with the Tkinter library for python guis, Demonstrate problem solving skills that come with a larger project**
 
