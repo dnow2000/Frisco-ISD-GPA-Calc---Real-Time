@@ -1,3 +1,7 @@
+'''
+Author @SumitNalavade
+'''
+
 from tkinter import Tk, Label, Button, Entry
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
