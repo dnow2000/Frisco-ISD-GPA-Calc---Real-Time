@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Label, Button, Entry
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
@@ -8,13 +8,9 @@ courseList = [] #Hold all the Course objects to run calculations off
 PATH = 'C:\Program Files (x86)\chromedriver.exe'
 opts = Options()
 opts.add_argument("--headless") #Toggle headless browser
-
 driver = webdriver.Chrome(PATH, options = opts) 
 
 gpas = None
-current_unweighted_gpa = None
-current_weighted_gpa = None
-current_gradelevel = None
 
 class Course(): #Course object
     def __init__(self, name, grade, weight, credits):
@@ -65,7 +61,7 @@ def create_login_page():
             login_page.destroy() 
             pass
 
-            get_grades() #If the login is successful, the calculation begins 
+            compute_gpa() #If the login is successful, the calculation begins 
         else:
             not_successful_popup = Tk()
             not_successful_popup.geometry('230x50')
@@ -82,9 +78,6 @@ def get_grades():
     global driver
     global PATH
     global courseList
-    global current_unweighted_gpa
-    global current_weighted_gpa
-    global current_gradelevel
 
     driver.get("https://hac.friscoisd.org/HomeAccess/Content/Student/Transcript.aspx")
 
@@ -126,13 +119,14 @@ def get_grades():
                 for b in double_weighted:
                     if(b in name.lower()):
                         credits = 2
-                
+                                
                 courseList.append(Course(name, grade, weight, credits)) #Creates a course object from the name, grade, wight and credits then appends it to the courselist
                 weight = 5
-                credits = 1
-    except:   
-        compute_gpa()
+                credits = 1        
+    except:
         driver.close() #Make sure to close the headless browser to prevent memory clog up
+        return (current_gradelevel, current_unweighted_gpa, current_weighted_gpa)
+        
         
 
 def create_display_page(): #Displays the final weighted and unweighted GPA 
@@ -185,9 +179,8 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
 def compute_gpa(): #calculates the weighted and unweighted gpas from the courselist, Returns a tuple of both
 	global courseList
 	global gpas
-	global current_unweighted_gpa
-	global current_weighted_gpa
-	global current_gradelevel
+
+	current_gradelevel, current_unweighted_gpa, current_weighted_gpa = get_grades()
 	
 	number_of_total_credits = 0
 	total_semesters = 0
