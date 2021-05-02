@@ -15,7 +15,7 @@ This project is designed to perform the correct calculations on student data fro
 
 *.exe file (For windows)*
 
-*.app file (Coming soon for Mac)*
+*.app file (For Mac)*
 
 The calculation works in two stages:
 1. Retreive the existing student GPA as noted on their transcript from HAC
