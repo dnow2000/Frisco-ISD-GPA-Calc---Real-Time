@@ -11,12 +11,6 @@ This project is designed to perform the correct calculations on student data fro
 ![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/cbdf16549215c9a311e133cc19e56c3d02747640/Login%20page.PNG)
 ![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/cbdf16549215c9a311e133cc19e56c3d02747640/Calc.PNG)
 
-*Two apps in repository:*
-
-*.exe file (For windows)*
-
-*.app file (For Mac)*
-
 The calculation works in two stages:
 1. Retreive the existing student GPA as noted on their transcript from HAC
 2. Retreieve all current student grades and use calculate the real time GPA
