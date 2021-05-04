@@ -2,17 +2,19 @@
 Author @SumitNalavade
 '''
 
+import tkinter
 from tkinter import Tk, Label, Button, Entry
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from PIL import Image, ImageTk
 
 courseList = [] #Hold all the Course objects to run calculations off
 
 PATH = 'C:\Program Files (x86)\chromedriver.exe'
 opts = Options()
 opts.add_argument("--headless") #Toggle headless browser
-driver = webdriver.Chrome(PATH, options = opts) 
+driver = webdriver.Chrome(PATH, options= opts) 
 
 gpas = None
 
@@ -30,20 +32,21 @@ class Course(): #Course object
 def create_login_page():
     #create main window
     login_page = Tk()
-    login_page.configure(background = '#6200EE') 
+    login_page.configure(background = '#3c008b') 
     login_page.geometry('300x300')
-    header = Label(login_page, background = '#6200EE' ,text = 'GPA CALCULATOR', fg = 'White', font = 'BEBAS 20 bold').place(x=20, y=0)
-    username_label = Label(login_page, text  = 'Enter Username:', background = '#6200EE', fg = 'White')
-    password_label = Label(login_page, text = 'Enter Password', background = '#6200EE', fg = 'White')
 
-    username_label.place(x = 20, y = 70)
-    password_label.place(x = 20, y = 120)
+    header = Label(login_page, background = '#3c008b' ,text = 'GPA CALCULATOR', fg = 'White', font = 'BEBAS 20 bold').place(x=20, y=0)
+    username_label = Label(login_page, text  = 'Enter Username:', background = '#3c008b', fg = 'White')
+    password_label = Label(login_page, text = 'Enter Password', background = '#3c008b', fg = 'White')
+
+    username_label.place(x = 30, y = 70)
+    password_label.place(x = 30, y = 120)
 
     username_entry = Entry(login_page)
     password_entry = Entry(login_page)
 
-    username_entry.place(x = 120, y = 70)
-    password_entry.place(x = 120, y = 120)
+    username_entry.place(x = 130, y = 70)
+    password_entry.place(x = 130, y = 120)
 
     #Authenticates Login
     def authenticate_login():
@@ -69,9 +72,9 @@ def create_login_page():
         else:
             not_successful_popup = Tk()
             not_successful_popup.geometry('230x50')
-            not_successful_popup.config(background = '#6200EE')
+            not_successful_popup.config(background = '#3c008b')
 
-            not_successful_label = Label(not_successful_popup, text = 'Incorrect Username or Password', background = '#6200EE', font = 'Bebas 10 bold', fg = 'White').pack() #Pop up if login not successful
+            not_successful_label = Label(not_successful_popup, text = 'Incorrect Username or Password', background = '#3c008b', font = 'Bebas 10 bold', fg = 'White').pack() #Pop up if login not successful
 
     login_button = Button(login_page, text = 'Login', command = authenticate_login, height = 1, width = 20, background = 'white', font = 'bebas 10 bold')
     login_button.place(x = 68, y = 200)
@@ -137,9 +140,9 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
     global gpas
 
     mainpage = Tk()
-    mainpage.configure(background = '#6200EE') 
+    mainpage.configure(background = '#3c008b') 
     mainpage.geometry('300x300')
-    header = Label(mainpage, background = '#6200EE' ,text = 'GPA CALCULATOR', fg = 'White', font = 'BEBAS 20 bold').place(x=20, y=0)
+    header = Label(mainpage, background = '#3c008b' ,text = 'GPA CALCULATOR', fg = 'White', font = 'BEBAS 20 bold').place(x=20, y=0)
 
 
     weighted_gpa, unweighted_gpa = gpas
@@ -147,17 +150,17 @@ def create_display_page(): #Displays the final weighted and unweighted GPA
     weighted_gpa = round(weighted_gpa, 3)
     unweighted_gpa = round(unweighted_gpa, 3)
 
-    weighted_gpa_header = Label(mainpage, text = 'Weighted GPA:', background = '#6200EE', font = 'bebas 15 bold', fg = 'White')
-    unweighted_gpa_header = Label(mainpage, text = 'Unweighted GPA:', background = '#6200EE', font = 'bebas 15 bold', fg = 'white')
+    weighted_gpa_header = Label(mainpage, text = 'Weighted GPA:', background = '#3c008b', font = 'bebas 15 bold', fg = 'White')
+    unweighted_gpa_header = Label(mainpage, text = 'Unweighted GPA:', background = '#3c008b', font = 'bebas 15 bold', fg = 'white')
 
-    weighted_gpa_header.place(x = 80, y = 70)
-    unweighted_gpa_header.place(x = 70, y = 170)
+    weighted_gpa_header.place(x = 75, y = 70)
+    unweighted_gpa_header.place(x = 65, y = 170)
 
-    weighted_gpa_label = Label(mainpage, text = weighted_gpa, background = '#6200EE', font = 'bebas 15 bold', fg ='White')
-    unweighted_gpa_label = Label(mainpage, text = unweighted_gpa, background = '#6200EE', font = 'bebas 15 bold', fg ='White')
+    weighted_gpa_label = Label(mainpage, text = weighted_gpa, background = '#3c008b', font = 'bebas 15 bold', fg ='White')
+    unweighted_gpa_label = Label(mainpage, text = unweighted_gpa, background = '#3c008b', font = 'bebas 15 bold', fg ='White')
 
-    weighted_gpa_label.place(x = 132, y = 100)
-    unweighted_gpa_label.place(x = 132, y = 200)
+    weighted_gpa_label.place(x = 123, y = 100)
+    unweighted_gpa_label.place(x = 123, y = 200)
 
     def redo(): #Redo Calculation with new parameters
         global courseList
@@ -237,5 +240,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
 
 
