@@ -8,8 +8,8 @@ Unfortunately for some students the mobile apps on both Android and iOS do not s
 This project is designed to perform the correct calculations on student data from the Home Access Center.
 
 ![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/main/HAC.png)
-![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/cbdf16549215c9a311e133cc19e56c3d02747640/Login%20page.PNG)
-![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/cbdf16549215c9a311e133cc19e56c3d02747640/Calc.PNG)
+![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/main/Login%20Page.PNG)
+![](https://github.com/SumitNalavade/Frisco-ISD-GPA-Calc---Real-Time/blob/main/Display%20Page.PNG)
 
 The calculation works in two stages:
 1. Retreive the existing student GPA as noted on their transcript from HAC
