@@ -40,19 +40,19 @@ def create_login_page():
 
     header = Label(login_page, background='#3c008b', text='GPA CALCULATOR',
                    fg='White', font='BEBAS 20 bold').place(x=20, y=0)
-    username_label = Label(login_page, text='Enter Username:',
+    username_label = Label(login_page, text='Enter HAC Username:',
                            background='#3c008b', fg='White')
-    password_label = Label(login_page, text='Enter Password',
+    password_label = Label(login_page, text='Enter HAC Password:',
                            background='#3c008b', fg='White')
 
-    username_label.place(x=30, y=70)
-    password_label.place(x=30, y=120)
+    username_label.place(x=20, y=70)
+    password_label.place(x=20, y=120)
 
     username_entry = Entry(login_page)
     password_entry = Entry(login_page, show="*")
 
-    username_entry.place(x=130, y=70)
-    password_entry.place(x=130, y=120)
+    username_entry.place(x=150, y=70)
+    password_entry.place(x=150, y=120)
 
     # Authenticates Login
     def authenticate_login():
@@ -155,7 +155,6 @@ def get_grades():
                 weight = 5
                 credits = 1
     except:
-        driver.close()  # Make sure to close the headless browser to prevent memory clog up
         return (current_gradelevel, current_unweighted_gpa, current_weighted_gpa)
 
 
@@ -188,6 +187,8 @@ def create_display_page():  # Displays the final weighted and unweighted GPA
 
     weighted_gpa_label.place(x=123, y=100)
     unweighted_gpa_label.place(x=123, y=200)
+
+    driver.quit()
 
     def redo():  # Redo Calculation with new parameters
         global courseList
