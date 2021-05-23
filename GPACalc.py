@@ -244,11 +244,11 @@ def compute_gpa():  # calculates the weighted and unweighted gpas from the cours
     for courses in courseList:  # Iterates through the courselist and calculates weighted GPA given the scale of each class
         if(courses.grade < 70):
             weightedGpa = 0
+        elif(courses.grade == 70):
+            weightedGpa = 3
         else:
             weightedGpa = (
                 (courses.weight - ((100 - courses.grade)/10)) * courses.credits)
-
-        print(weightedGpa)
 
         weighted_gpa_list.append(weightedGpa)
 
@@ -257,6 +257,8 @@ def compute_gpa():  # calculates the weighted and unweighted gpas from the cours
     for courses in courseList:  # Iterates through the courselist and calculates unweighted GPA out of 4.0
         if (courses.grade < 70):
             unweightedGpa = 0
+        elif(courses.grade == 70):
+            unweightedGpa = 2
         else:
             unweightedGpa = ((4.0 - ((90 - courses.grade)/10))
                              * courses.credits)
